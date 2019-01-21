@@ -1,4 +1,4 @@
-package br.com.ilink.zenviaapi;
+package br.com.ilink.zenviaapi.utils;
 
 import br.com.ilink.zenviaapi.annotations.DefaultBooleanIfNULL;
 import br.com.ilink.zenviaapi.annotations.DefaultDateIfNULL;

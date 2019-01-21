@@ -1,5 +1,6 @@
 package br.com.ilink.zenviaapi.models;
 
+import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +10,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SMSResponse {
+@JsonRootName("SMSResponse")
+public class SMSResponseModel {
 
   private String statusCode;
   private String statusDescription;

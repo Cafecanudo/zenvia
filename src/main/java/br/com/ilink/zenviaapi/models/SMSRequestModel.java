@@ -1,6 +1,6 @@
 package br.com.ilink.zenviaapi.models;
 
-import br.com.ilink.zenviaapi.BuilderValidation;
+import br.com.ilink.zenviaapi.utils.BuilderValidation;
 import br.com.ilink.zenviaapi.annotations.DefaultBooleanIfNULL;
 import br.com.ilink.zenviaapi.annotations.DefaultDateIfNULL;
 import br.com.ilink.zenviaapi.annotations.DefaultValueOptionIfNULL;
