@@ -24,7 +24,7 @@ abstract class TrustConnection {
     }
   }
 
-  public OkHttpClient buildClient() {
+  protected OkHttpClient buildClient() {
     return new OkHttpClient.Builder()
         .sslSocketFactory(trustAllSslContext.getSocketFactory(),
             (X509TrustManager) trustAllCerts[0])
@@ -39,7 +39,7 @@ abstract class TrustConnection {
 
   protected abstract String authorization();
 
-  private static class TrustManagerBuild {
+  public static class TrustManagerBuild {
 
     public static TrustManager[] build() {
       return new TrustManager[]{

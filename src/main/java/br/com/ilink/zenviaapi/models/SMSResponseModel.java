@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonRootName("SMSResponse")
+@JsonRootName("sendSmsRequest")
 public class SMSResponseModel {
 
   private String statusCode;

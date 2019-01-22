@@ -27,7 +27,7 @@ public class ConverterUtil {
     }
   }
 
-  public static String toJson(Object value) {
+  public static String toJsonString(Object value) {
     try {
       return new ObjectMapper().writeValueAsString(value);
     } catch (JsonProcessingException e) {
