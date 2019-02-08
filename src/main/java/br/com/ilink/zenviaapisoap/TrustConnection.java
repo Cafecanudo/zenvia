@@ -1,4 +1,4 @@
-package br.com.ilink.zenviaapi;
+package br.com.ilink.zenviaapisoap;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -9,7 +9,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import okhttp3.OkHttpClient;
 
-public abstract class TrustConnection {
+abstract class TrustConnection {
 
   private static final SSLContext trustAllSslContext;
   private static final TrustManager[] trustAllCerts;

@@ -1,15 +1,15 @@
-package br.com.ilink.zenviaapi.models;
+package br.com.ilink.zenviaapisoap.models;
 
-import br.com.ilink.zenviaapi.utils.BuilderValidation;
-import br.com.ilink.zenviaapi.annotations.DefaultBooleanIfNULL;
-import br.com.ilink.zenviaapi.annotations.DefaultDateIfNULL;
-import br.com.ilink.zenviaapi.annotations.DefaultValueOptionIfNULL;
-import br.com.ilink.zenviaapi.annotations.NotBlank;
-import br.com.ilink.zenviaapi.annotations.OnlyNumber;
-import br.com.ilink.zenviaapi.annotations.Size;
-import br.com.ilink.zenviaapi.exceptions.ValidationException;
-import br.com.ilink.zenviaapi.models.converters.LocalDateTimeSerializer;
-import br.com.ilink.zenviaapi.models.enums.CallbackOptionEnum;
+import br.com.ilink.zenviaapisoap.annotations.DefaultBooleanIfNULL;
+import br.com.ilink.zenviaapisoap.annotations.DefaultDateIfNULL;
+import br.com.ilink.zenviaapisoap.annotations.DefaultValueOptionIfNULL;
+import br.com.ilink.zenviaapisoap.annotations.NotBlank;
+import br.com.ilink.zenviaapisoap.annotations.OnlyNumber;
+import br.com.ilink.zenviaapisoap.annotations.Size;
+import br.com.ilink.zenviaapisoap.exceptions.ValidationException;
+import br.com.ilink.zenviaapisoap.models.converters.LocalDateTimeSerializer;
+import br.com.ilink.zenviaapisoap.models.enums.CallbackOptionEnum;
+import br.com.ilink.zenviaapisoap.utils.BuilderValidation;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.LocalDateTime;

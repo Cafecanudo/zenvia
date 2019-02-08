@@ -5,14 +5,16 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.ZonedDateTime;
 
-public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
+public class ZonedDateTimeDeserializerToLocalDateTime extends JsonDeserializer<LocalDateTime> {
 
   @Override
   public LocalDateTime deserialize(JsonParser jsonParser,
       DeserializationContext deserializationContext) throws IOException {
-    DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-    return LocalDateTime.parse(jsonParser.getText(), format);
+    if (jsonParser.getText().isEmpty()){
+      return null;
+    }
+    return ZonedDateTime.parse(jsonParser.getText()).toLocalDateTime();
   }
 }

@@ -1,4 +1,4 @@
-package br.com.ilink.zenviaapi.models;
+package br.com.ilink.zenviaapisoap.models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,9 +8,8 @@ import lombok.Data;
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SendSmsRequest {
+public class SendSmsMultiRequest {
 
-  @JsonProperty("sendSmsRequest")
-  public SingleSMS singleSMS;
-
+  @JsonProperty("sendSmsMultiRequest")
+  private SendSmsMultiRequestParam sendSmsMultiRequestParam;
 }

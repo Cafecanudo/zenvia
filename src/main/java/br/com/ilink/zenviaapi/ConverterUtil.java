@@ -1,4 +1,4 @@
-package br.com.ilink.zenviaapi.utils;
+package br.com.ilink.zenviaapi;
 
 import br.com.ilink.zenviaapi.exceptions.ProcessorException;
 import com.fasterxml.jackson.core.JsonProcessingException;

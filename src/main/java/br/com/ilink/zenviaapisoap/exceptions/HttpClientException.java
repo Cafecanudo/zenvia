@@ -1,4 +1,4 @@
-package br.com.ilink.zenviaapi.exceptions;
+package br.com.ilink.zenviaapisoap.exceptions;
 
 import java.io.IOException;
 
@@ -10,9 +10,5 @@ public class HttpClientException extends RuntimeException {
 
   public HttpClientException() {
     super();
-  }
-
-  public HttpClientException(String message) {
-    super(message);
   }
 }

@@ -1,4 +1,4 @@
-package br.com.ilink.zenviaapi.models;
+package br.com.ilink.zenviaapisoap.models;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.AllArgsConstructor;

@@ -1,10 +1,11 @@
-package br.com.ilink.zenviaapi;
+package br.com.ilink.zenviaapisoap;
 
-import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.any;
 import static org.powermock.api.mockito.PowerMockito.doThrow;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
@@ -12,11 +13,16 @@ import static org.powermock.api.mockito.PowerMockito.spy;
 import static org.powermock.api.mockito.PowerMockito.when;
 import static org.powermock.api.mockito.PowerMockito.whenNew;
 
-import br.com.ilink.zenviaapi.ZenviaAPI.ReceivedMessage;
-import br.com.ilink.zenviaapi.exceptions.HttpClientException;
+import br.com.ilink.zenviaapisoap.exceptions.HttpClientException;
+import br.com.ilink.zenviaapisoap.exceptions.ValidationException;
+import br.com.ilink.zenviaapisoap.models.SMSRequestModel;
+import br.com.ilink.zenviaapisoap.models.SMSResponseModel;
+import br.com.ilink.zenviaapisoap.utils.ConverterUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +33,6 @@ import okhttp3.OkHttpClient.Builder;
 import okhttp3.Request;
 import okhttp3.Response;
 import okio.Timeout;
-import org.hamcrest.collection.IsEmptyCollection;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,7 +52,7 @@ public class ZenviaAPITest {
 
   @Mock
   Properties prop;
-  ZenviaAPI.SMSRequest req;
+  SMSRequestModel req;
 
   @Rule
   ExpectedException expectedException = ExpectedException.none();
@@ -55,77 +60,18 @@ public class ZenviaAPITest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    req = ZenviaAPI.SMSRequest.builder()
-        .para("5562996020305")
-        .mensagem("Mensagem de teste")
-        .codigoInterno("123456CALL")
+    req = SMSRequestModel.builder()
+        .to("5562994427822")
+        .msg("Mensagem de teste")
+        .schedule(LocalDateTime
+            .parse("15/04/2019 15:45:22", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")))
         .build();
-  }
-
-  @Test
-  public void testConsultaPorPeriodoDeveSerVazia() throws IOException {
-    mockStatic(HttpClient.class);
-    when(HttpClient.GET(any(), any(), any()))
-        .thenReturn("{\n"
-            + "    \"receivedResponse\": {\n"
-            + "        \"statusCode\": \"00\",\n"
-            + "        \"statusDescription\": \"Ok\",\n"
-            + "        \"detailCode\": \"301\",\n"
-            + "        \"detailDescription\": \"No received messages found\",\n"
-            + "        \"receivedMessages\": null\n"
-            + "    }\n"
-            + "}");
-
-    List<ZenviaAPI.ReceivedMessage> resp = ZenviaAPI
-        .preparar(LocalDateTime.now().minusMinutes(5), LocalDateTime.now())
-        .check();
-    assertThat(resp, is(IsEmptyCollection.empty()));
-  }
-
-  @Test
-  public void testConsultaPorPeriodoDeveTerUm() throws IOException {
-    mockStatic(HttpClient.class);
-    when(HttpClient.GET(any(), any(), any()))
-        .thenReturn("{\n"
-            + "    \"receivedResponse\": {\n"
-            + "        \"statusCode\": \"00\",\n"
-            + "        \"statusDescription\": \"Ok\",\n"
-            + "        \"detailCode\": \"301\",\n"
-            + "        \"detailDescription\": \"No received messages found\",\n"
-            + "        \"receivedMessages\":  [\n"
-            + "          {\n"
-            + "            \"id\": 23190501,\n"
-            + "            \"dateReceived\": \"2014-08-22T14:49:36\",\n"
-            + "            \"mobile\": \"5511999999999\",\n"
-            + "            \"body\": \"Pare\",\n"
-            + "            \"shortcode\": \"30133\",\n"
-            + "            \"mobileOperatorName\": \"Claro\",\n"
-            + "            \"mtId\": \"hs863223748\"\n"
-            + "          },\n"
-            + "          {\n"
-            + "            \"id\": 4532,\n"
-            + "            \"dateReceived\": \"2014-08-22T14:49:36\",\n"
-            + "            \"mobile\": \"5511999999999\",\n"
-            + "            \"body\": \"Pare\",\n"
-            + "            \"shortcode\": \"30133\",\n"
-            + "            \"mobileOperatorName\": \"Claro\",\n"
-            + "            \"mtId\": \"hs863223748\"\n"
-            + "          }\n"
-            + "        ]"
-            + "    }\n"
-            + "}");
-
-    List<ReceivedMessage> resp = ZenviaAPI
-        .preparar(LocalDateTime.now().minusMinutes(5), LocalDateTime.now())
-        .check();
-    assertThat(resp, not(IsEmptyCollection.empty()));
-    assertThat(resp, is(hasSize(2)));
   }
 
   @Test
   public void testarEnvioDeUnicoSMS() {
     mockStatic(HttpClient.class);
-    when(HttpClient.POST(any(), any(), any()))
+    when(HttpClient.POST(any(), any()))
         .thenReturn("{"
             + "  \"sendSmsResponse\": {"
             + "    \"statusCode\": \"00\","
@@ -135,15 +81,92 @@ public class ZenviaAPITest {
             + "  }"
             + "}");
 
-    List<ZenviaAPI.SMSResponse> resps = ZenviaAPI.preparar(req).enviar();
-    assertThat(resps, is(notNullValue()));
+    SMSResponseModel response = ZenviaAPI.SMS(req).sendUnique();
+    assertThat(response, is(notNullValue()));
+  }
+
+  @Test
+  public void testarEnvioDeMultiplosSMS() {
+    mockStatic(HttpClient.class);
+    when(HttpClient.POST(any(), any()))
+        .thenReturn("{\n"
+            + "  \"sendSmsMultiResponse\": {\n"
+            + "    \"sendSmsResponseList\": [\n"
+            + "      {\n"
+            + "        \"statusCode\": \"00\",\n"
+            + "        \"statusDescription\": \"Ok\",\n"
+            + "        \"detailCode\": \"000\",\n"
+            + "        \"detailDescription\": \"Message Sent\"\n"
+            + "      },\n"
+            + "      {\n"
+            + "        \"statusCode\": \"00\",\n"
+            + "        \"statusDescription\": \"Ok\",\n"
+            + "        \"detailCode\": \"000\",\n"
+            + "        \"detailDescription\": \"Message Sent\"\n"
+            + "      }\n"
+            + "    ]\n"
+            + "  }\n"
+            + "}");
+
+    List<SMSResponseModel> list = ZenviaAPI.SMS(req).sendMultiple();
+    assertThat(list, is(notNullValue()));
+    assertThat(list, not(empty()));
+    assertThat(list, hasSize(2));
+  }
+
+  @Test
+  public void testarSaidaDeConvertaoUnicoItem() throws Exception {
+    SMSRequestModel[] model = {req, req};
+    ZenviaAPI zenviaAPI = spy(ZenviaAPI.SMS(model));
+
+    JsonNode json = Whitebox.invokeMethod(zenviaAPI,
+        "converterObjeto", 1234);
+
+    assertThat(json, is(notNullValue()));
+    assertThat(json, is(ConverterUtil.toJson("{\n"
+        + "  \"sendSmsMultiRequest\": {\n"
+        + "    \"aggregateId\": 1234,\n"
+        + "    \"sendSmsRequestList\": [\n"
+        + "      {\n"
+        + "        \"to\": \"5562994427822\",\n"
+        + "        \"schedule\": \"2019-04-15T15:45:22\",\n"
+        + "        \"msg\": \"Mensagem de teste\",\n"
+        + "        \"callbackOption\": \"NONE\",\n"
+        + "        \"flashSms\": false\n"
+        + "      },\n"
+        + "      {\n"
+        + "        \"to\": \"5562994427822\",\n"
+        + "        \"schedule\": \"2019-04-15T15:45:22\",\n"
+        + "        \"msg\": \"Mensagem de teste\",\n"
+        + "        \"callbackOption\": \"NONE\",\n"
+        + "        \"flashSms\": false\n"
+        + "      }\n"
+        + "    ]\n"
+        + "  }\n"
+        + "}")));
+  }
+
+  @Test
+  public void testarEnvioComListaVazia() {
+    expectedException.expect(ValidationException.class);
+    expectedException.expectMessage("Requisição esta vazia!");
+
+    ZenviaAPI.SMS().sendUnique();
+  }
+
+  @Test
+  public void testarEnvioUnicoComListaMaiorQue2() {
+    expectedException.expect(ValidationException.class);
+    expectedException.expectMessage("sendUnique enviar somente uma mensagem e você adicionou [3].");
+
+    ZenviaAPI.SMS(req, req, req).sendUnique();
   }
 
   @Test
   public void testarExcecoesServicosUnknownHostException() throws Exception {
     mockStatic(HttpClient.class);
     doThrow(new HttpClientException(new UnknownHostException("https://nao-existe-isso")))
-        .when(HttpClient.class, "POST", any(), any(), any());
+        .when(HttpClient.class, "POST", any(), any());
 
     when(prop, "getProperty", "config.url")
         .thenReturn("https://nao-existe-isso");
@@ -152,7 +175,7 @@ public class ZenviaAPITest {
     expectedException.expect(HttpClientException.class);
     expectedException.expectMessage("java.net.UnknownHostException: https://nao-existe-isso");
 
-    ZenviaAPI.preparar(req).enviar();
+    ZenviaAPI.SMS(req).sendUnique();
   }
 
   @Test
@@ -171,7 +194,7 @@ public class ZenviaAPITest {
         .build());
 
     whenNew(HttpClient.class).withNoArguments().thenReturn(httpClient);
-    ZenviaAPI.preparar(req).enviar();
+    ZenviaAPI.SMS(req).sendUnique();
   }
 
   @Test
@@ -190,7 +213,7 @@ public class ZenviaAPITest {
         .build());
 
     whenNew(HttpClient.class).withNoArguments().thenReturn(httpClient);
-    ZenviaAPI.preparar(req).enviar();
+    ZenviaAPI.SMS(req, req).sendMultiple();
   }
 
   @Test
@@ -250,7 +273,7 @@ public class ZenviaAPITest {
     when(httpClient, "buildClient").thenReturn(okClient);
 
     whenNew(HttpClient.class).withNoArguments().thenReturn(httpClient);
-    ZenviaAPI.preparar(req).enviar();
+    ZenviaAPI.SMS(req).sendUnique();
   }
 
 }

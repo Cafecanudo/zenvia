@@ -1,4 +1,4 @@
-package br.com.ilink.zenviaapi.models;
+package br.com.ilink.zenviaapisoap.models;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
@@ -7,8 +7,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-import br.com.ilink.zenviaapi.exceptions.ValidationException;
-import br.com.ilink.zenviaapi.models.enums.CallbackOptionEnum;
+import br.com.ilink.zenviaapisoap.exceptions.ValidationException;
+import br.com.ilink.zenviaapisoap.models.enums.CallbackOptionEnum;
 import java.time.LocalDateTime;
 import org.junit.Rule;
 import org.junit.Test;
